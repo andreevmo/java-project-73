@@ -3,10 +3,18 @@ plugins {
 	id 'org.springframework.boot' version '3.0.0'
 	id 'io.spring.dependency-management' version '1.1.0'
 	id 'application'
+	id 'checkstyle'
 }
 
 application {
 	mainClass = 'hexlet.code.app.AppApplication'
+}
+
+tasks.withType(Checkstyle) {
+	reports {
+		xml.required = false
+		html.required = true
+	}
 }
 
 group = 'hexlet.code'
