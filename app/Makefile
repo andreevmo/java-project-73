@@ -8,13 +8,13 @@ build:
 	./gradlew clean build
 
 start:
-	APP_ENV=development ./gradlew run
+	./gradlew run
 
 install:
 	./gradlew install
 
 start-dist:
-	APP_ENV=production ./build/install/app/bin/app
+	java -jar -Dspring.profiles.active=production app/build/libs/app-1.0-SNAPSHOT.jar
 
 generate-migrations:
 	./gradlew generateMigrations

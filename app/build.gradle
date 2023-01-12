@@ -1,10 +1,11 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.0.0'
+	id 'org.springframework.boot' version '2.5.6'
 	id 'io.spring.dependency-management' version '1.1.0'
 	id 'application'
 	id 'checkstyle'
 	id 'jacoco'
+	id 'org.liquibase.gradle' version '2.0.4'
 }
 
 application {
@@ -35,8 +36,52 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.liquibase:liquibase-core:4.6.1'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+
+	runtimeOnly 'com.h2database:h2:1.4.200'
+	runtimeOnly 'org.postgresql:postgresql:42.2.24'
+
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.2.Final'
+
+	liquibaseRuntime(
+			sourceSets.main.output,
+			'org.liquibase:liquibase-core:4.6.1',
+			'org.liquibase.ext:liquibase-hibernate5:4.5.0',
+			'org.springframework.boot:spring-boot-starter-data-jpa'
+	)
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.assertj:assertj-core:3.23.1'
+}
+
+diffChangeLog {
+	dependsOn compileJava
+}
+// Настраиваем Liquibase
+liquibase {
+	activities {
+		main {
+			// Указываем путь, по которому будет сгенерирован файл миграции
+			changeLogFile 'src/main/resources/db/changelog/changelog-master.xml'
+			// Указываем источник, с которым будут сравниваться изменения
+			// Это база данных, изначально она пустая
+			url 'jdbc:h2:./taskManager'
+			// Имя пользователя и пароль для подключения к базе
+			username ''
+			password ''
+			// Сравниваем с моделями, задавая пакет
+			referenceUrl 'hibernate:spring:hexlet.code.app.model.' +
+					// Указываем диалект
+					'?dialect=org.hibernate.dialect.H2Dialect' +
+					// Указываем правила именования таблиц и столбцов,
+					// чтобы они соответствовали правилам Spring
+					'&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy'
+		}
+	}
 }
 
 tasks.named('test') {
