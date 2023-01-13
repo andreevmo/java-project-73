@@ -10,11 +10,11 @@ build:
 start:
 	./gradlew run
 
-install:
-	./gradlew install
+installDist:
+	./gradlew installDist
 
 start-dist:
-	java -jar -Dspring.profiles.active=production app/build/libs/app-1.0-SNAPSHOT.jar
+	APP_ENV=production ./build/install/app/bin/app
 
 generate-migrations:
 	./gradlew generateMigrations

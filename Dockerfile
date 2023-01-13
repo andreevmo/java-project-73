@@ -6,4 +6,4 @@ COPY /app .
 
 RUN gradle installDist
 
-CMD java -jar -Dspring.profiles.active=production build/libs/app-1.0-SNAPSHOT.jar
+CMD ./build/install/app/bin/app

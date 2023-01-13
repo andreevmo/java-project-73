@@ -10,14 +10,11 @@ build:
 start:
 	make -C app start
 
-install:
-	make -C app install
+installDist:
+	make -C app installDist
 
 start-dist:
 	make -C app start-dist
-
-generate-migrations:
-	make -C app generate-migrations
 
 lint:
 	make -C app lint
