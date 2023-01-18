@@ -15,6 +15,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 
@@ -29,9 +32,17 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @NotNull
+    @Size(min = 1)
     private String firstName;
+    @NotNull
+    @Size(min = 1)
     private String lastName;
+    @NotNull
+    @Email
     private String email;
+    @NotNull
+    @Size(min = 3)
     private String password;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
