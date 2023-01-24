@@ -1,10 +1,10 @@
-package hexlet.code.app.DTO;
+package hexlet.code.app.domain.DTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.Date;
 
 @Getter
@@ -18,4 +18,7 @@ public class UserDTO {
     private String lastName;
     private String email;
     private Date createdAt;
+    @JsonIgnore
+    private String password;
+
 }

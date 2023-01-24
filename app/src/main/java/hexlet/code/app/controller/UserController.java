@@ -1,10 +1,7 @@
 package hexlet.code.app.controller;
 
-import hexlet.code.app.DTO.UserDTO;
-import hexlet.code.app.exception.IncorrectInputException;
-import hexlet.code.app.exception.UserNotFoundException;
-import hexlet.code.app.model.User;
-import hexlet.code.app.repository.UserRepository;
+import hexlet.code.app.domain.DTO.UserDTO;
+import hexlet.code.app.domain.model.User;
 import hexlet.code.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -19,61 +16,36 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping(path = "/users")
 public final class UserController {
 
     @Autowired
-    private UserRepository repository;
-
-    @Autowired
     private UserService userService;
 
     @GetMapping(path = "/{id}")
     public UserDTO getUser(@PathVariable long id) {
-        User user = repository.findById(id)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User with this id was not found"));
-        return userService.getUserDTO(user);
+        return userService.getUser(id);
     }
 
     @GetMapping(path = "")
     public List<UserDTO> getUsers() {
-        Iterable<User> users = repository.findAll();
-        return StreamSupport.stream(users.spliterator(), false)
-                .map(user -> userService.getUserDTO(user))
-                .toList();
+        return userService.getUsers();
     }
 
     @PostMapping(path = "")
     public UserDTO createUser(@Valid @RequestBody User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new IncorrectInputException("Input incorrect");
-        }
-        return userService.getUserDTO(userService.saveUser(user));
+        return userService.saveUser(user, bindingResult);
     }
 
     @PutMapping(path = "/{id}")
     public UserDTO updateUser(@PathVariable long id, @Valid @RequestBody User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new IncorrectInputException("Input incorrect");
-        }
-        User userFromDatabase = repository.findById(id)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User with this id was not found"));
-
-        user.setId(id);
-        user.setCreatedAt(userFromDatabase.getCreatedAt());
-        return userService.getUserDTO(userService.saveUser(user));
+        return userService.updateUser(id, user, bindingResult);
     }
 
     @DeleteMapping(path = "/{id}")
     public void deleteUser(@PathVariable long id) {
-        User userFromDatabase = repository.findById(id)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User with this id was not found"));
-        repository.deleteById(id);
+        userService.deleteUser(id);
     }
 }

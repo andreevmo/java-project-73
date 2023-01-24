@@ -41,6 +41,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.liquibase:liquibase-core:4.6.1'
 	implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5',
+			// Uncomment the next line if you want to use RSASSA-PSS (PS256, PS384, PS512) algorithms:
+			//'org.bouncycastle:bcprov-jdk15on:1.70',
+			'io.jsonwebtoken:jjwt-jackson:0.11.5' // or 'io.jsonwebtoken:jjwt-gson:0.11.5' for gson
 
 	runtimeOnly 'com.h2database:h2:1.4.200'
 	runtimeOnly 'org.postgresql:postgresql:42.2.24'
@@ -57,6 +62,7 @@ dependencies {
 	)
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.assertj:assertj-core:3.23.1'
 }
 
@@ -76,7 +82,7 @@ liquibase {
 			username ''
 			password ''
 			// Сравниваем с моделями, задавая пакет
-			referenceUrl 'hibernate:spring:hexlet.code.app.model.' +
+			referenceUrl 'hibernate:spring:hexlet.code.app.domain.model.' +
 					// Указываем диалект
 					'?dialect=org.hibernate.dialect.H2Dialect' +
 					// Указываем правила именования таблиц и столбцов,
