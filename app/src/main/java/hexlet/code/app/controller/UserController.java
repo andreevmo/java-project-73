@@ -18,7 +18,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/users")
+@RequestMapping(path = "${base-url}" + "/users")
 public final class UserController {
 
     @Autowired

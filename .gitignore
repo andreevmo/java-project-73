@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 
 *.db
+app/node
 
 ### STS ###
 .apt_generated

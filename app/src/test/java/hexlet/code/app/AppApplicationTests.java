@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -47,8 +46,7 @@ class AppApplicationTests {
     private UserRepository userRepository;
     private static List<User> usersForTest;
 
-    private static Path path = Path.of("src/test/resources/users");
-    private static String baseUrl = "http://localhost:5000";
+    private static String baseUrl = "http://localhost:5000" + "/api";
 
     @BeforeEach
     void beforeEach() {

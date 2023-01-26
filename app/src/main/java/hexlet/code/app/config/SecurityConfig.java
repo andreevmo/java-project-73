@@ -42,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .antMatchers("/api/users").permitAll()
+                .antMatchers("/**").permitAll()
                 .antMatchers("/h2-console/*").permitAll()
                 .anyRequest().authenticated();
 
