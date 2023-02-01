@@ -2,8 +2,9 @@ package hexlet.code.app.controller;
 
 import hexlet.code.app.domain.DTO.UserDTO;
 import hexlet.code.app.domain.model.User;
-import hexlet.code.app.service.UserService;
+import hexlet.code.app.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,35 +18,43 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.List;
 
+import static hexlet.code.app.controller.UserController.USER_CONTROLLER_PATH;
+
 @RestController
-@RequestMapping(path = "${base-url}" + "/users")
-public final class UserController {
+@RequestMapping(path = "${base-url}" + USER_CONTROLLER_PATH)
+public class UserController {
+
+    public static final String USER_CONTROLLER_PATH = "/users";
+    public static final String ID = "/{id}";
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
-    @GetMapping(path = "/{id}")
+    @GetMapping(path = ID)
     public UserDTO getUser(@PathVariable long id) {
-        return userService.getUser(id);
+        return userServiceImpl.getUser(id);
     }
 
     @GetMapping(path = "")
     public List<UserDTO> getUsers() {
-        return userService.getUsers();
+        return userServiceImpl.getAll();
     }
 
-    @PostMapping(path = "")
+    @PostMapping
     public UserDTO createUser(@Valid @RequestBody User user, BindingResult bindingResult) {
-        return userService.saveUser(user, bindingResult);
+        return userServiceImpl.saveUser(user, bindingResult);
     }
 
-    @PutMapping(path = "/{id}")
+    @PutMapping(path = ID)
+    @PreAuthorize("@userRepository.findById(#id).get().getEmail() == authentication.getName()")
     public UserDTO updateUser(@PathVariable long id, @Valid @RequestBody User user, BindingResult bindingResult) {
-        return userService.updateUser(id, user, bindingResult);
+        return userServiceImpl.updateUser(id, user, bindingResult);
+
     }
 
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = ID)
+    @PreAuthorize("@userRepository.findById(#id).get().getEmail() == authentication.getName()")
     public void deleteUser(@PathVariable long id) {
-        userService.deleteUser(id);
+        userServiceImpl.deleteUser(id);
     }
 }
