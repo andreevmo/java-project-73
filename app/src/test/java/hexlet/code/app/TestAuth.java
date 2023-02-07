@@ -1,6 +1,5 @@
 package hexlet.code.app;
 
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,30 +24,33 @@ public class TestAuth {
 
     @Autowired
     private MockMvc mockMvc;
-
     private final String baseUrl = "http://localhost:5000/api";
-
 
     @Test
     void testWithoutAuthUsers() throws Exception {
-
         mockMvc.perform(put(baseUrl + "/users/1"))
                 .andExpect(status().isUnauthorized());
-
         mockMvc.perform(delete(baseUrl + "/users/1"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     void testWithoutAuthStatuses() throws Exception {
-
         mockMvc.perform(post(baseUrl + "/statuses"))
                 .andExpect(status().isUnauthorized());
-
         mockMvc.perform(put(baseUrl + "/statuses/1"))
                 .andExpect(status().isUnauthorized());
-
         mockMvc.perform(delete(baseUrl + "/statuses/1"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void testWithoutAuthTasks() throws Exception {
+        mockMvc.perform(post(baseUrl + "/task"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(put(baseUrl + "/task/1"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(delete(baseUrl + "/task/1"))
                 .andExpect(status().isUnauthorized());
     }
 }

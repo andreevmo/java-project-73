@@ -20,9 +20,6 @@ jobs:
           arguments: build
           build-root-directory: app
 
-      - name: Execute Gradle build
-        run: make build
-
       - name: Publish code coverage
         uses: paambaati/codeclimate-action@v3.0.0
         if: ${{ github.event_name == 'push' }}

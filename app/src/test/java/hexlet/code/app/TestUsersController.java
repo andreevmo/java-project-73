@@ -29,12 +29,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static hexlet.code.app.controller.UserController.USER_CONTROLLER_PATH;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @TestPropertySource("/application-test.properties")
 @WithMockUser(username = "ivan@google.com")
-@Sql(value = {"/import.sql"})
+@Sql(value = {"/importSQL/importUsers.sql"})
 class TestUsersController {
 
     @Autowired
@@ -45,8 +46,8 @@ class TestUsersController {
     @Autowired
     private JwtUtils jwtUtils;
     private static List<User> usersForTest;
-    private final String baseUrl = "http://localhost:5000/api";
-    private String body = """
+    private final String baseUrl = "http://localhost:5000/api" + USER_CONTROLLER_PATH;
+    private final String body = """
                 {
                 "email": "maxim_525@mail.ru",
                 "firstName": "Maxim",
@@ -67,14 +68,14 @@ class TestUsersController {
 
     @Test
     void test() throws Exception {
-        mockMvc.perform(get(baseUrl + "/welcome"))
+        mockMvc.perform(get("http://localhost:5000/api/welcome"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Welcome to Spring"));
     }
 
     @Test
     void testGetUserPositive() throws Exception {
-        String answer = mockMvc.perform(get(baseUrl + "/users/2"))
+        String answer = mockMvc.perform(get(baseUrl + "/2"))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
@@ -88,14 +89,14 @@ class TestUsersController {
 
     @Test
     void testGetUserNegative() throws Exception {
-        mockMvc.perform(get(baseUrl + "/users/10"))
+        mockMvc.perform(get(baseUrl + "/10"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void testGetUsers() throws Exception {
         String response = mockMvc
-                .perform(get(baseUrl + "/users"))
+                .perform(get(baseUrl))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -106,7 +107,6 @@ class TestUsersController {
         assertThat(response).contains(firstUser.getFirstName());
         assertThat(response).contains(firstUser.getLastName());
         assertThat(response).contains("createdAt");
-
         User secondUser = usersForTest.get(1);
         assertThat(response).contains(secondUser.getEmail());
         assertThat(response).doesNotContain("password");
@@ -118,7 +118,7 @@ class TestUsersController {
     @Test
     void testPostUser() throws Exception {
         String response = mockMvc
-                .perform(post(baseUrl + "/users")
+                .perform(post(baseUrl)
                         .content(body)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -134,18 +134,20 @@ class TestUsersController {
 
     @Test
     void testPostUserNegative() throws Exception {
-        mockMvc.perform(post(baseUrl + "/users")
-                        .content(body.replace("some-password1", "so"))
+        mockMvc.perform(post(baseUrl)
+                        .content(body.replace(
+                                "\"some-password1\"", "null"))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     void testPutUser() throws Exception {
+        String token = jwtUtils.generateJwtToken("ivan@google.com");
         String answer = mockMvc
-                .perform(put(baseUrl + "/users/1")
+                .perform(put(baseUrl + "/1")
                         .content(body)
-                        .header("Authorization", jwtUtils.generateJwtToken("ivan@google.com"))
+                        .header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -160,7 +162,7 @@ class TestUsersController {
 
     @Test
     void testPutUserNegative() throws Exception {
-        mockMvc.perform(put(baseUrl + "/users/1")
+        mockMvc.perform(put(baseUrl + "/1")
                         .content(body.replace("Andreev", ""))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity());
@@ -168,8 +170,14 @@ class TestUsersController {
 
     @Test
     void testDeleteUser() throws Exception {
-        mockMvc.perform(delete(baseUrl + "/users/1"))
+        mockMvc.perform(delete(baseUrl + "/1"))
                 .andExpect(status().isOk());
         assertThat(userRepository.existsById(1L)).isFalse();
+    }
+    @Test
+    void testDeleteUserNegative() throws Exception {
+        mockMvc.perform(delete(baseUrl + "/2"))
+                .andExpect(status().isForbidden());
+        assertThat(userRepository.existsById(2L)).isTrue();
     }
 }

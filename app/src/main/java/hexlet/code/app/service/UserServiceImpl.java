@@ -2,82 +2,59 @@ package hexlet.code.app.service;
 
 import hexlet.code.app.domain.DTO.UserDTO;
 import hexlet.code.app.domain.model.User;
-import hexlet.code.app.exception.AuthenticationException;
-import hexlet.code.app.exception.IncorrectInputException;
-import hexlet.code.app.exception.UserNotFoundException;
 import hexlet.code.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
+import java.util.NoSuchElementException;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UserDTO saveUser(User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new IncorrectInputException("Input incorrect");
-        }
+    public User saveUser(UserDTO userDTO) {
+        User user = createUser(userDTO);
         String password = user.getPassword();
         String encodedPassword = passwordEncoder.encode(password);
         user.setPassword(encodedPassword);
-        try {
-            return getUserDTO(userRepository.save(user));
-        } catch (Exception e) {
-            throw new IncorrectInputException("Input incorrect");
-        }
+        return userRepository.save(user);
     }
 
-    public UserDTO updateUser(Long id, User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new IncorrectInputException("Input incorrect");
-        }
-        User userFromDatabase = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User with this id was not found"));
+    public User updateUser(Long id, UserDTO userDTO) {
+        User user = createUser(userDTO);
+        User userFromDatabase = userRepository.findById(id).orElseThrow();
         user.setId(id);
         user.setCreatedAt(userFromDatabase.getCreatedAt());
-        return saveUser(user, bindingResult);
+        return userRepository.save(user);
     }
 
-    public List<UserDTO> getAll() {
-        Iterable<User> users = userRepository.findAll();
-        return StreamSupport.stream(users.spliterator(), false)
-                .map(this::getUserDTO)
-                .toList();
+    public List<User> getAll() {
+        return (List<User>) userRepository.findAll();
     }
 
-    public UserDTO getUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User with this id was not found"));
-        return getUserDTO(user);
+    public User getUser(Long id) {
+        return userRepository.findById(id).orElseThrow();
     }
 
-    public void deleteUser(Long id) throws AuthenticationException {
-        User userFromDatabase = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User with this id was not found"));
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new NoSuchElementException();
+        }
         userRepository.deleteById(id);
     }
 
-    public UserDTO getUserDTO(User user) {
-        return new UserDTO(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getCreatedAt(),
-                user.getPassword()
+    private User createUser(UserDTO userDTO) {
+        return new User(
+                userDTO.getFirstName(),
+                userDTO.getLastName(),
+                userDTO.getEmail(),
+                userDTO.getPassword()
         );
     }
 }

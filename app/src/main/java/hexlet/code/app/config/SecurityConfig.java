@@ -15,10 +15,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
-
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
@@ -43,17 +46,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        RequestMatcher publicUrls = new OrRequestMatcher(
+                new AntPathRequestMatcher("/api/users", POST.name()),
+                new AntPathRequestMatcher("/api/users", GET.name()),
+                new AntPathRequestMatcher("/api/login", POST.name()),
+                new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**"))
+        );
         http.csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .antMatchers(POST, "/api/users").permitAll()
-                .antMatchers(GET, "/api/users").permitAll()
-                .antMatchers(POST, "/api/login").permitAll()
-                .antMatchers(GET, "/static/**", "/*").permitAll()
+                .requestMatchers(publicUrls).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(authJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.headers().frameOptions().disable();
     }
 
     @Override

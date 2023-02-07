@@ -18,7 +18,6 @@ public class JwtUtils {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     public String generateJwtToken(String username) {
-
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())

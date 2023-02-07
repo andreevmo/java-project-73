@@ -1,21 +1,16 @@
 package hexlet.code.app.service;
 
-import hexlet.code.app.domain.model.Role;
 import hexlet.code.app.domain.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -24,39 +19,27 @@ import java.util.stream.Collectors;
 @Service
 public class UserDetailsImpl implements UserDetails {
 
-
     private long id;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
-
     private Date createdAt;
 
-    private Set<Role> roles;
-
-    private Collection<? extends GrantedAuthority> authorities;
-
     public static UserDetailsImpl build(User user) {
-        List<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
-                .collect(Collectors.toList());
-
         return new UserDetailsImpl(
                 user.getId(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
                 user.getPassword(),
-                user.getCreatedAt(),
-                user.getRoles(),
-                authorities);
+                user.getCreatedAt()
+        );
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return null;
     }
-
 
     @Override
     public String getUsername() {
