@@ -1,9 +1,11 @@
 package hexlet.code.app.service;
 
 import hexlet.code.app.domain.DTO.TaskDTO;
+import hexlet.code.app.domain.model.Label;
 import hexlet.code.app.domain.model.Status;
 import hexlet.code.app.domain.model.Task;
 import hexlet.code.app.domain.model.User;
+import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.StatusRepository;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.UserRepository;
@@ -12,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -24,6 +28,8 @@ public class TaskServiceImpl implements TaskService {
     private UserRepository userRepository;
     @Autowired
     private StatusRepository statusRepository;
+    @Autowired
+    private LabelRepository labelRepository;
     @Override
     public Task saveTask(TaskDTO taskDTO) {
         Task task = createTask(taskDTO);
@@ -65,12 +71,17 @@ public class TaskServiceImpl implements TaskService {
         User executor = taskDTO.getExecutorId() == null ? null
                 : userRepository.findById(taskDTO.getExecutorId()).orElse(null);
         Status status = statusRepository.findById(taskDTO.getTaskStatusId()).orElseThrow();
+        List<Label> labelList = taskDTO.getLabelIds() == null ? new ArrayList<>()
+                : Arrays.stream(taskDTO.getLabelIds())
+                .map(id -> labelRepository.findById(id).orElseThrow())
+                .toList();
         return new Task(
                 taskDTO.getName(),
                 taskDTO.getDescription(),
                 status,
                 author,
-                executor
+                executor,
+                labelList
         );
     }
 }

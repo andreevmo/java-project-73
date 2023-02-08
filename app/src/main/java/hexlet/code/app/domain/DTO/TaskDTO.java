@@ -19,6 +19,7 @@ public class TaskDTO {
     private String description;
     @NotNull
     private Long taskStatusId;
+    private Long[] labelIds;
     private User author;
     private Long executorId;
     private Date createdAt;

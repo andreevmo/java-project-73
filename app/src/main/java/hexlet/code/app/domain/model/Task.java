@@ -11,11 +11,15 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "tasks")
@@ -35,15 +39,23 @@ public class Task {
     private User author;
     @ManyToOne(fetch = FetchType.EAGER)
     private User executor;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "task_label",
+            joinColumns = {@JoinColumn(name = "label_id")},
+            inverseJoinColumns = {@JoinColumn(name = "task_id")})
+    private List<Label> labelList;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    public Task(String name, String description, Status taskStatus, @NonNull User author, User executor) {
+    public Task(String name, String description, Status taskStatus, @NonNull User author, User executor,
+                List<Label> labelList) {
         this.name = name;
         this.description = description;
         this.taskStatus = taskStatus;
         this.author = author;
         this.executor = executor;
+        this.labelList = labelList;
     }
 }
