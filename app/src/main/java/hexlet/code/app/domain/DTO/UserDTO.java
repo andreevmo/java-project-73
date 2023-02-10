@@ -2,19 +2,19 @@ package hexlet.code.app.domain.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.Date;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class UserDTO  extends BaseDTO {
 
-    private long id;
     @NotBlank
     @Size(min = 1)
     private String firstName;
@@ -27,5 +27,4 @@ public class UserDTO {
     @NotBlank
     @Size(min = 3)
     private String password;
-    private Date createdAt;
 }
