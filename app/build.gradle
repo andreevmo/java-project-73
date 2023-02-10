@@ -8,6 +8,7 @@ plugins {
 	id 'org.liquibase.gradle' version '2.0.4'
 	// Сборщик фронтенда
 	id 'org.siouan.frontend-jdk11' version '6.0.0'
+	id 'java-library' // QueryDSL must have
 }
 
 application {
@@ -37,6 +38,8 @@ repositories {
 }
 
 dependencies {
+	api 'com.querydsl:querydsl-jpa:4.4.0' // QueryDSL must have
+
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -55,6 +58,8 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.2.Final'
+	annotationProcessor 'com.querydsl:querydsl-apt:4.4.0:jpa' // QueryDSL must have (exactly this way, including :jpa)
+	annotationProcessor 'javax.annotation:javax.annotation-api' // QueryDSL must have
 
 	liquibaseRuntime(
 			sourceSets.main.output,

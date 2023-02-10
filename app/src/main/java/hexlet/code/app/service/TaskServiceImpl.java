@@ -1,5 +1,6 @@
 package hexlet.code.app.service;
 
+import com.querydsl.core.types.Predicate;
 import hexlet.code.app.domain.DTO.TaskDTO;
 import hexlet.code.app.domain.model.Label;
 import hexlet.code.app.domain.model.Status;
@@ -10,6 +11,7 @@ import hexlet.code.app.repository.StatusRepository;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -46,8 +48,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getAll() {
-        return (List<Task>) taskRepository.findAll();
+    public List<Task> getAll(Predicate predicate, Pageable pageable) {
+        return (List<Task>) taskRepository.findAll(predicate);
     }
 
     @Override

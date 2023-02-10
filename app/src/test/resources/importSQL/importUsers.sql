@@ -1,3 +1,4 @@
+DELETE FROM task_label;
 DELETE FROM tasks;
 DELETE FROM users;
 

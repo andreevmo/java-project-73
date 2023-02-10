@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.lang.NonNull;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -39,23 +40,23 @@ public class Task {
     private User author;
     @ManyToOne(fetch = FetchType.EAGER)
     private User executor;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "task_label",
-            joinColumns = {@JoinColumn(name = "label_id")},
-            inverseJoinColumns = {@JoinColumn(name = "task_id")})
-    private List<Label> labelList;
+            joinColumns = {@JoinColumn(name = "task_id")},
+            inverseJoinColumns = {@JoinColumn(name = "label_id")})
+    private List<Label> labels;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     public Task(String name, String description, Status taskStatus, @NonNull User author, User executor,
-                List<Label> labelList) {
+                List<Label> labels) {
         this.name = name;
         this.description = description;
         this.taskStatus = taskStatus;
         this.author = author;
         this.executor = executor;
-        this.labelList = labelList;
+        this.labels = labels;
     }
 }

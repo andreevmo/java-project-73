@@ -53,4 +53,14 @@ public class TestAuth {
         mockMvc.perform(delete(baseUrl + "/task/1"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    void testWithoutAuthLabels() throws Exception {
+        mockMvc.perform(post(baseUrl + "/labels"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(put(baseUrl + "/labels/1"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(delete(baseUrl + "/labels/1"))
+                .andExpect(status().isUnauthorized());
+    }
 }

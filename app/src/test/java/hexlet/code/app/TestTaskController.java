@@ -2,8 +2,12 @@ package hexlet.code.app;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.app.domain.model.Label;
+import hexlet.code.app.domain.model.Status;
 import hexlet.code.app.domain.model.Task;
 import hexlet.code.app.domain.model.User;
+import hexlet.code.app.repository.LabelRepository;
+import hexlet.code.app.repository.StatusRepository;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +41,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @TestPropertySource("/application-test.properties")
 @WithMockUser(username = "ivan@google.com")
-@Sql(value = {"/importSQL/importUsers.sql", "/importSQL/importStatuses.sql", "/importSQL/importTasks.sql"})
+@Sql(value = {
+    "/importSQL/importUsers.sql",
+    "/importSQL/importStatuses.sql",
+    "/importSQL/importLabels.sql",
+    "/importSQL/importTasks.sql"
+})
 public class TestTaskController {
 
     @Autowired
@@ -47,6 +56,10 @@ public class TestTaskController {
     private TaskRepository taskRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private LabelRepository labelRepository;
+    @Autowired
+    private StatusRepository statusRepository;
     @Autowired
     private ObjectMapper mapper;
     private List<Task> tasks;
@@ -141,8 +154,8 @@ public class TestTaskController {
         mockMvc.perform(post(baseUrl)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body.replace(
-                                "\"name\": \"Новое имя\",",
-                                "\"name\": \"\",")
+                                "\"Новое имя\",",
+                                "\"\",")
                         ))
                 .andExpect(status().isUnprocessableEntity());
         assertThat(taskRepository.existsByName("")).isFalse();
@@ -150,16 +163,44 @@ public class TestTaskController {
 
     @Test
     void testDeleteTask() throws Exception {
-        mockMvc.perform(delete(baseUrl + "/1"))
+        mockMvc.perform(delete(baseUrl + "/2"))
                 .andExpect(status().isOk());
-        assertThat(taskRepository.existsById(1L)).isFalse();
+        assertThat(taskRepository.existsById(2L)).isFalse();
     }
 
     @Test
     @WithMockUser(username = "petr@google.com")
     void testDeleteTaskNegative() throws Exception {
-        mockMvc.perform(delete(baseUrl + "/1"))
+        mockMvc.perform(delete(baseUrl + "/2"))
                 .andExpect(status().isForbidden());
-        assertThat(taskRepository.existsById(1L)).isTrue();
+        assertThat(taskRepository.existsById(2L)).isTrue();
+    }
+
+    @Test
+    void testGetTaskWithFilter() throws Exception {
+        String response = mockMvc.perform(get(baseUrl + "?taskStatus=1&executorId=2&labels=1"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
+        System.out.println();
+        System.out.println(response);
+        System.out.println();
+        Label labelFirst = labelRepository.findById(1L).orElseThrow();
+        Label labelSecond = labelRepository.findById(2L).orElseThrow();
+        Status statusFirst = statusRepository.findById(1L).orElseThrow();
+        Status statusSecond = statusRepository.findById(2L).orElseThrow();
+        User executorFirst = userRepository.findById(1L).orElseThrow();
+        User executorSecond = userRepository.findById(2L).orElseThrow();
+        assertThat(response).contains(
+                mapper.writeValueAsString(statusFirst),
+                mapper.writeValueAsString(executorSecond),
+                mapper.writeValueAsString(labelFirst)
+        );
+        assertThat(response).doesNotContain(
+                mapper.writeValueAsString(statusSecond),
+                mapper.writeValueAsString(executorFirst),
+                mapper.writeValueAsString(labelSecond)
+        );
     }
 }

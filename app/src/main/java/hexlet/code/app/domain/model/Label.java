@@ -30,8 +30,6 @@ public class Label {
     @CreationTimestamp
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date createdAt;
-//    @ManyToMany(mappedBy = "labelList", fetch = FetchType.EAGER)
-//    private List<Task> taskList;
 
     public Label(String name) {
         this.name = name;

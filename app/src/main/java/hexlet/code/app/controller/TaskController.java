@@ -1,9 +1,12 @@
 package hexlet.code.app.controller;
 
+import com.querydsl.core.types.Predicate;
 import hexlet.code.app.domain.DTO.TaskDTO;
 import hexlet.code.app.domain.model.Task;
 import hexlet.code.app.service.TaskServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,8 +35,8 @@ public class TaskController {
     }
 
     @GetMapping
-    public List<Task> getUsers() {
-        return taskService.getAll();
+    public List<Task> getUsers(@QuerydslPredicate(root = Task.class) Predicate predicate, Pageable pageable) {
+        return taskService.getAll(predicate, pageable);
     }
 
     @PostMapping
