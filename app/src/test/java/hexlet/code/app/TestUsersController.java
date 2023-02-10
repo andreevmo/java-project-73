@@ -1,6 +1,6 @@
 package hexlet.code.app;
 
-import hexlet.code.app.config.jwt.JwtUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.domain.model.User;
 import hexlet.code.app.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -18,18 +18,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
+import static hexlet.code.app.TestUtils.BODY_FOR_TEST_USERS;
+import static hexlet.code.app.TestUtils.TEST_PATH;
+import static hexlet.code.app.TestUtils.performRequest;
+import static hexlet.code.app.controller.UserController.USER_CONTROLLER_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static hexlet.code.app.controller.UserController.USER_CONTROLLER_PATH;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -44,22 +40,13 @@ class TestUsersController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private JwtUtils jwtUtils;
+    private ObjectMapper mapper;
     private static List<User> usersForTest;
-    private final String baseUrl = "http://localhost:5000/api" + USER_CONTROLLER_PATH;
-    private final String body = """
-                {
-                "email": "maxim_525@mail.ru",
-                "firstName": "Maxim",
-                "lastName": "Andreev",
-                "password": "some-password1"
-                }
-                """;
+    private final String baseUrl = TEST_PATH + USER_CONTROLLER_PATH;
 
     @BeforeEach
     void beforeEach() {
-        usersForTest = StreamSupport.stream(userRepository.findAll().spliterator(), false)
-                .collect(Collectors.toList());
+        usersForTest = (List<User>) userRepository.findAll();
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(springSecurity())
@@ -67,117 +54,66 @@ class TestUsersController {
     }
 
     @Test
-    void test() throws Exception {
-        mockMvc.perform(get("http://localhost:5000/api/welcome"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Welcome to Spring"));
+    void testWelcome() throws Exception {
+        String answer = performRequest(mockMvc, TEST_PATH + "/welcome", HttpMethod.GET, status().isOk());
+        assertThat(answer).contains("Welcome to Spring");
     }
 
     @Test
     void testGetUserPositive() throws Exception {
-        String answer = mockMvc.perform(get(baseUrl + "/2"))
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-        assertThat(answer).contains(usersForTest.get(1).getEmail());
-        assertThat(answer).contains(usersForTest.get(1).getFirstName());
-        assertThat(answer).contains(usersForTest.get(1).getLastName());
-        assertThat(answer).contains("createdAt");
-        assertThat(answer).doesNotContain("password");
+        String answer = performRequest(mockMvc, baseUrl + "/2", HttpMethod.GET, status().isOk());
+        assertThat(answer).isEqualTo(mapper.writeValueAsString(usersForTest.get(1)));
     }
 
     @Test
     void testGetUserNegative() throws Exception {
-        mockMvc.perform(get(baseUrl + "/10"))
-                .andExpect(status().isNotFound());
+        performRequest(mockMvc, baseUrl + "/10", HttpMethod.GET, status().isNotFound());
     }
 
     @Test
     void testGetUsers() throws Exception {
-        String response = mockMvc
-                .perform(get(baseUrl))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        User firstUser = usersForTest.get(0);
-        assertThat(response).contains(firstUser.getEmail());
-        assertThat(response).doesNotContain("password");
-        assertThat(response).contains(firstUser.getFirstName());
-        assertThat(response).contains(firstUser.getLastName());
-        assertThat(response).contains("createdAt");
-        User secondUser = usersForTest.get(1);
-        assertThat(response).contains(secondUser.getEmail());
-        assertThat(response).doesNotContain("password");
-        assertThat(response).contains(secondUser.getFirstName());
-        assertThat(response).contains(secondUser.getLastName());
-        assertThat(response).contains("createdAt");
+        String answer = performRequest(mockMvc, baseUrl, HttpMethod.GET, status().isOk());
+        assertThat(answer).isEqualTo(mapper.writeValueAsString(usersForTest));
     }
 
     @Test
     void testPostUser() throws Exception {
-        String response = mockMvc
-                .perform(post(baseUrl)
-                        .content(body)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(response).contains("maxim_525@mail.ru");
-        assertThat(response).doesNotContain("password");
-        assertThat(response).contains("Maxim");
-        assertThat(response).contains("Andreev");
-        assertThat(response).contains("createdAt");
+        String answer = performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isOk(), BODY_FOR_TEST_USERS);
+        User user = userRepository.findById(3L).orElseThrow();
+        assertThat(user.getEmail()).isEqualTo("maxim_525@mail.ru");
+        assertThat(answer).isEqualTo(mapper.writeValueAsString(user));
     }
 
     @Test
     void testPostUserNegative() throws Exception {
-        mockMvc.perform(post(baseUrl)
-                        .content(body.replace(
-                                "\"some-password1\"", "null"))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnprocessableEntity());
+        String incorrectBody = BODY_FOR_TEST_USERS.replace("\"some-password1\"", "null");
+        performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isUnprocessableEntity(), incorrectBody);
     }
 
     @Test
     void testPutUser() throws Exception {
-        String token = jwtUtils.generateJwtToken("ivan@google.com");
-        String answer = mockMvc
-                .perform(put(baseUrl + "/1")
-                        .content(body)
-                        .header("Authorization", token)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertThat(answer).contains("maxim_525@mail.ru");
-        assertThat(answer).doesNotContain("password");
-        assertThat(answer).contains("Maxim");
-        assertThat(answer).contains("Andreev");
-        assertThat(answer).contains("createdAt");
+        String oldEmail = usersForTest.get(0).getEmail();
+        String answer = performRequest(
+                mockMvc, baseUrl + "/1", HttpMethod.PUT, status().isOk(), BODY_FOR_TEST_USERS);
+        User user = userRepository.findById(1L).orElseThrow();
+        assertThat(user.getEmail()).isNotEqualTo(oldEmail).isEqualTo("maxim_525@mail.ru");
+        assertThat(answer).isEqualTo(mapper.writeValueAsString(user));
     }
 
     @Test
     void testPutUserNegative() throws Exception {
-        mockMvc.perform(put(baseUrl + "/1")
-                        .content(body.replace("Andreev", ""))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnprocessableEntity());
+        String incorrectBody = BODY_FOR_TEST_USERS.replace("Andreev", "");
+        performRequest(mockMvc, baseUrl + "/1", HttpMethod.PUT, status().isUnprocessableEntity(), incorrectBody);
     }
 
     @Test
     void testDeleteUser() throws Exception {
-        mockMvc.perform(delete(baseUrl + "/1"))
-                .andExpect(status().isOk());
+        performRequest(mockMvc, baseUrl + "/1", HttpMethod.DELETE, status().isOk());
         assertThat(userRepository.existsById(1L)).isFalse();
     }
     @Test
     void testDeleteUserNegative() throws Exception {
-        mockMvc.perform(delete(baseUrl + "/2"))
-                .andExpect(status().isForbidden());
+        performRequest(mockMvc, baseUrl + "/2", HttpMethod.DELETE, status().isForbidden());
         assertThat(userRepository.existsById(2L)).isTrue();
     }
 }

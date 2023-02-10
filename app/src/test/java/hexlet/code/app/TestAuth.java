@@ -1,66 +1,46 @@
 package hexlet.code.app;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static hexlet.code.app.TestUtils.TEST_PATH;
+import static hexlet.code.app.TestUtils.performRequest;
+import static hexlet.code.app.controller.LabelController.LABEL_CONTROLLER_PATH;
+import static hexlet.code.app.controller.StatusController.STATUS_CONTROLLER_PATH;
+import static hexlet.code.app.controller.TaskController.TASK_CONTROLLER_PATH;
+import static hexlet.code.app.controller.UserController.USER_CONTROLLER_PATH;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @TestPropertySource("/application-test.properties")
 @AutoConfigureMockMvc
-@Sql(value = {"/import.sql"})
 public class TestAuth {
 
     @Autowired
     private MockMvc mockMvc;
-    private final String baseUrl = "http://localhost:5000/api";
 
-    @Test
-    void testWithoutAuthUsers() throws Exception {
-        mockMvc.perform(put(baseUrl + "/users/1"))
-                .andExpect(status().isUnauthorized());
-        mockMvc.perform(delete(baseUrl + "/users/1"))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    void testWithoutAuthStatuses() throws Exception {
-        mockMvc.perform(post(baseUrl + "/statuses"))
-                .andExpect(status().isUnauthorized());
-        mockMvc.perform(put(baseUrl + "/statuses/1"))
-                .andExpect(status().isUnauthorized());
-        mockMvc.perform(delete(baseUrl + "/statuses/1"))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    void testWithoutAuthTasks() throws Exception {
-        mockMvc.perform(post(baseUrl + "/task"))
-                .andExpect(status().isUnauthorized());
-        mockMvc.perform(put(baseUrl + "/task/1"))
-                .andExpect(status().isUnauthorized());
-        mockMvc.perform(delete(baseUrl + "/task/1"))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    void testWithoutAuthLabels() throws Exception {
-        mockMvc.perform(post(baseUrl + "/labels"))
-                .andExpect(status().isUnauthorized());
-        mockMvc.perform(put(baseUrl + "/labels/1"))
-                .andExpect(status().isUnauthorized());
-        mockMvc.perform(delete(baseUrl + "/labels/1"))
-                .andExpect(status().isUnauthorized());
+    @ParameterizedTest
+    @ValueSource(strings = {
+        USER_CONTROLLER_PATH,
+        LABEL_CONTROLLER_PATH,
+        STATUS_CONTROLLER_PATH,
+        TASK_CONTROLLER_PATH
+    })
+    void testRequestWithoutAuth(String controllerPath) throws Exception {
+        if (!controllerPath.equals(USER_CONTROLLER_PATH)) {
+            performRequest(mockMvc, TEST_PATH + controllerPath, HttpMethod.GET, status().isUnauthorized());
+            performRequest(mockMvc, TEST_PATH + controllerPath, HttpMethod.POST, status().isUnauthorized());
+        }
+        performRequest(mockMvc, TEST_PATH + controllerPath + "/1", HttpMethod.PUT, status().isUnauthorized());
+        performRequest(mockMvc, TEST_PATH + controllerPath + "/1", HttpMethod.DELETE, status().isUnauthorized());
     }
 }

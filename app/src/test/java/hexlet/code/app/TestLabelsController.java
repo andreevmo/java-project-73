@@ -1,5 +1,6 @@
 package hexlet.code.app;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.domain.model.Label;
 import hexlet.code.app.repository.LabelRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -16,17 +17,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.stream.StreamSupport;
 
+import static hexlet.code.app.TestUtils.BODY_FOR_TEST_LABELS;
+import static hexlet.code.app.TestUtils.TEST_PATH;
+import static hexlet.code.app.TestUtils.performRequest;
 import static hexlet.code.app.controller.LabelController.LABEL_CONTROLLER_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -41,18 +39,14 @@ public class TestLabelsController {
     private MockMvc mockMvc;
     @Autowired
     private LabelRepository labelRepository;
-    private final String baseUrl = "http://localhost:5000/api" + LABEL_CONTROLLER_PATH;
+    @Autowired
+    private ObjectMapper mapper;
+    private final String baseUrl = TEST_PATH + LABEL_CONTROLLER_PATH;
     private List<Label> labelList;
-    private final String body = """
-                {
-                "name": "bug"
-                }
-                """;
 
     @BeforeEach
     void beforeEach() {
-        labelList = StreamSupport.stream(labelRepository.findAll().spliterator(), false)
-                .toList();
+        labelList = (List<Label>) labelRepository.findAll();
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(springSecurity())
@@ -61,75 +55,49 @@ public class TestLabelsController {
 
     @Test
     void testGetStatus() throws Exception {
-        String answer = mockMvc.perform(get(baseUrl + "/1"))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-        assertThat(answer).contains(labelList.get(0).getName());
+        String answer = performRequest(mockMvc, baseUrl + "/1", HttpMethod.GET, status().isOk());
+        assertThat(answer).contains(mapper.writeValueAsString(labelList.get(0)));
     }
 
     @Test
     void testGetStatuses() throws Exception {
-        String answer = mockMvc.perform(get(baseUrl))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-        assertThat(answer).contains(
-                labelList.get(0).getName(),
-                labelList.get(1).getName()
-        );
+        String answer = performRequest(mockMvc, baseUrl, HttpMethod.GET, status().isOk());
+        assertThat(answer).isEqualTo(mapper.writeValueAsString(labelList));
     }
 
     @Test
     void testPostStatus() throws Exception {
-        String answer = mockMvc.perform(
-                        post(baseUrl)
-                                .content(body)
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-        assertThat(answer).contains("bug");
+        String answer = performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isOk(), BODY_FOR_TEST_LABELS);
+        Label label = labelRepository.findById(3L).orElseThrow();
+        assertThat(label.getName()).isEqualTo("bug");
+        assertThat(answer).contains(mapper.writeValueAsString(label));
     }
 
     @Test
     void testPostStatusNegative() throws Exception {
-        mockMvc.perform(
-                        post(baseUrl)
-                                .content(body.replace("bug", ""))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnprocessableEntity());
+        String incorrectBody = BODY_FOR_TEST_LABELS.replace("bug", "");
+        performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isUnprocessableEntity(), incorrectBody);
     }
 
     @Test
     void testPutStatusNegative() throws Exception {
-        mockMvc.perform(
-                        put(baseUrl + "/1")
-                                .content(body.replace("bug", ""))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnprocessableEntity());
+        String incorrectBody = BODY_FOR_TEST_LABELS.replace("bug", "");
+        performRequest(mockMvc, baseUrl + "/1", HttpMethod.PUT, status().isUnprocessableEntity(), incorrectBody);
     }
 
     @Test
     void testPutStatus() throws Exception {
-        String answer = mockMvc.perform(
-                        put(baseUrl + "/1")
-                                .content(body)
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-        assertThat(answer).contains("bug");
+        String oldName = labelList.get(0).getName();
+        String answer = performRequest(
+                mockMvc, baseUrl + "/1", HttpMethod.PUT, status().isOk(), BODY_FOR_TEST_LABELS);
+        Label label = labelRepository.findById(1L).orElseThrow();
+        assertThat(label.getName()).isNotEqualTo(oldName).isEqualTo("bug");
+        assertThat(answer).contains(mapper.writeValueAsString(label));
     }
 
     @Test
     void testDeleteStatus() throws Exception {
-        mockMvc.perform(delete(baseUrl + "/1"))
-                .andExpect(status().isOk());
+        performRequest(mockMvc, baseUrl + "/1", HttpMethod.DELETE, status().isOk());
         assertThat(labelRepository.existsById(1L)).isFalse();
     }
 }

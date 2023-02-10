@@ -1,6 +1,5 @@
 package hexlet.code.app;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.domain.model.Label;
 import hexlet.code.app.domain.model.Status;
@@ -15,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -24,17 +23,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.stream.StreamSupport;
 
+import static hexlet.code.app.TestUtils.BODY_FOR_TEST_TASK;
 import static hexlet.code.app.controller.TaskController.TASK_CONTROLLER_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -63,19 +57,11 @@ public class TestTaskController {
     @Autowired
     private ObjectMapper mapper;
     private List<Task> tasks;
-    private final String baseUrl = "http://localhost:5000/api" + TASK_CONTROLLER_PATH;
-    private final String body = """
-                {
-                    "name": "Новое имя",
-                    "description": "Новое описание",
-                    "executorId": 2,
-                    "taskStatusId": 2
-                }
-                """;
+    private final String baseUrl = TestUtils.TEST_PATH + TASK_CONTROLLER_PATH;
 
     @BeforeEach
     void beforeEach() {
-        tasks = StreamSupport.stream(taskRepository.findAll().spliterator(), false).toList();
+        tasks = (List<Task>) taskRepository.findAll();
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(springSecurity())
@@ -84,11 +70,7 @@ public class TestTaskController {
 
     @Test
     void testGetTasks() throws Exception {
-        String answer = mockMvc.perform(get(baseUrl))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
+        String answer = TestUtils.performRequest(mockMvc, baseUrl, HttpMethod.GET, status().isOk());
         String firstTask = mapper.writeValueAsString(tasks.get(0));
         assertThat(answer).contains(firstTask);
         String secondTask = mapper.writeValueAsString(tasks.get(1));
@@ -97,24 +79,15 @@ public class TestTaskController {
 
     @Test
     void testGetTask() throws Exception {
-        String answer = mockMvc.perform(get(baseUrl + "/1"))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
+        String answer = TestUtils.performRequest(mockMvc, baseUrl + "/1", HttpMethod.GET, status().isOk());
         String firstTask = mapper.writeValueAsString(tasks.get(0));
         assertThat(answer).contains(firstTask);
     }
 
     @Test
     void testPutTask() throws Exception {
-        String answer = mockMvc.perform(put(baseUrl + "/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
+        String answer = TestUtils.performRequest(
+                mockMvc, baseUrl + "/1", HttpMethod.PUT, status().isOk(), BODY_FOR_TEST_TASK);
         String oldTask = mapper.writeValueAsString(tasks.get(0));
         Task updateTask = taskRepository.findById(1L).orElseThrow();
         String updateTaskJson = mapper.writeValueAsString(updateTask);
@@ -124,83 +97,59 @@ public class TestTaskController {
 
     @Test
     void testPutTaskNegative() throws Exception {
-        mockMvc.perform(put(baseUrl + "/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body.replace("2", "null")))
-                .andExpect(status().isUnprocessableEntity());
+        String incorrectBody = BODY_FOR_TEST_TASK.replace("2", "null");
+        TestUtils.performRequest(
+                mockMvc, baseUrl + "/1", HttpMethod.PUT, status().isUnprocessableEntity(), incorrectBody);
     }
 
     @Test
     void testPostTask() throws Exception {
-        String answer = mockMvc.perform(post(baseUrl)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
+        String answer = TestUtils.performRequest(
+                mockMvc, baseUrl, HttpMethod.POST, status().isOk(), BODY_FOR_TEST_TASK);
         Task task = taskRepository.findById(3L).orElseThrow();
         assertThat(task.getName()).isEqualTo("Новое имя");
         assertThat(task.getDescription()).isEqualTo("Новое описание");
         User executor = userRepository.findById(2L).orElseThrow();
         assertThat(task.getExecutor().getEmail()).isEqualTo(executor.getEmail());
-        assertThat(answer).isEqualTo(
-                mapper.writeValueAsString(task)
-        );
+        assertThat(answer).isEqualTo(mapper.writeValueAsString(task));
     }
 
     @Test
     void testPostTaskNegative() throws Exception {
-        mockMvc.perform(post(baseUrl)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body.replace(
-                                "\"Новое имя\",",
-                                "\"\",")
-                        ))
-                .andExpect(status().isUnprocessableEntity());
+        String incorrectBody = BODY_FOR_TEST_TASK.replace("\"Новое имя\",", "\"\",");
+        TestUtils.performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isUnprocessableEntity(), incorrectBody);
         assertThat(taskRepository.existsByName("")).isFalse();
     }
 
     @Test
     void testDeleteTask() throws Exception {
-        mockMvc.perform(delete(baseUrl + "/2"))
-                .andExpect(status().isOk());
+        TestUtils.performRequest(mockMvc, baseUrl + "/2", HttpMethod.DELETE, status().isOk());
         assertThat(taskRepository.existsById(2L)).isFalse();
     }
 
     @Test
     @WithMockUser(username = "petr@google.com")
     void testDeleteTaskNegative() throws Exception {
-        mockMvc.perform(delete(baseUrl + "/2"))
-                .andExpect(status().isForbidden());
+        TestUtils.performRequest(mockMvc, baseUrl + "/2", HttpMethod.DELETE, status().isForbidden());
         assertThat(taskRepository.existsById(2L)).isTrue();
     }
 
     @Test
     void testGetTaskWithFilter() throws Exception {
-        String response = mockMvc.perform(get(baseUrl + "?taskStatus=1&executorId=2&labels=1"))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-        System.out.println();
-        System.out.println(response);
-        System.out.println();
-        Label labelFirst = labelRepository.findById(1L).orElseThrow();
-        Label labelSecond = labelRepository.findById(2L).orElseThrow();
-        Status statusFirst = statusRepository.findById(1L).orElseThrow();
-        Status statusSecond = statusRepository.findById(2L).orElseThrow();
-        User executorFirst = userRepository.findById(1L).orElseThrow();
-        User executorSecond = userRepository.findById(2L).orElseThrow();
-        assertThat(response).contains(
-                mapper.writeValueAsString(statusFirst),
-                mapper.writeValueAsString(executorSecond),
-                mapper.writeValueAsString(labelFirst)
+        String answer = TestUtils.performRequest(mockMvc, baseUrl + "?taskStatus=1&executorId=2&labels=1",
+                HttpMethod.GET, status().isOk(), BODY_FOR_TEST_TASK);
+        List<Label> labels = (List<Label>) labelRepository.findAll();
+        List<Status> statuses = (List<Status>) statusRepository.findAll();
+        List<User> executors = (List<User>) userRepository.findAll();
+        assertThat(answer).contains(
+                mapper.writeValueAsString(statuses.get(0)),
+                mapper.writeValueAsString(executors.get(1)),
+                mapper.writeValueAsString(labels.get(0))
         );
-        assertThat(response).doesNotContain(
-                mapper.writeValueAsString(statusSecond),
-                mapper.writeValueAsString(executorFirst),
-                mapper.writeValueAsString(labelSecond)
+        assertThat(answer).doesNotContain(
+                mapper.writeValueAsString(statuses.get(1)),
+                mapper.writeValueAsString(executors.get(0)),
+                mapper.writeValueAsString(labels.get(1))
         );
     }
 }
