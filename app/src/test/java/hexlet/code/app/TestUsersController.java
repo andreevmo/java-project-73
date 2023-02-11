@@ -114,6 +114,13 @@ class TestUsersController {
     @Test
     void testDeleteUserNegative() throws Exception {
         performRequest(mockMvc, baseUrl + "/2", HttpMethod.DELETE, status().isForbidden());
+        performRequest(mockMvc, baseUrl + "/4", HttpMethod.DELETE, status().isNotFound());
         assertThat(userRepository.existsById(2L)).isTrue();
+    }
+
+    @Test
+    void testUniqueEmail() throws Exception {
+        performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isOk(), BODY_FOR_TEST_USERS);
+        performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isUnprocessableEntity(), BODY_FOR_TEST_USERS);
     }
 }

@@ -38,6 +38,12 @@ public class TestUtils {
                 "name": "bug"
                 }
                 """;
+    public static final String BODY_FOR_TEST_LOGIN = """
+               {
+                    "email": "ivan@google.com",
+                    "password": "some-password"
+               }
+               """;
 
     public static String performRequest(
             MockMvc mockMvc, String baseUrl, HttpMethod httpMethod, ResultMatcher status) throws Exception {

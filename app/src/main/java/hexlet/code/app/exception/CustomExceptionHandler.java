@@ -7,18 +7,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.validation.ConstraintViolationException;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
-public class ExceptionHandlerApi {
+public class CustomExceptionHandler {
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<String> incorrectInputException(ConstraintViolationException e) {
-        return ResponseEntity
-                .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body("Incorrect input");
-    }
 
     @ExceptionHandler(org.hibernate.exception.ConstraintViolationException.class)
     public ResponseEntity<String> incorrectInputException(org.hibernate.exception.ConstraintViolationException e) {
@@ -42,10 +35,9 @@ public class ExceptionHandlerApi {
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<String> objectNotFound(AuthenticationException e) {
+    public ResponseEntity<String> authException(AuthenticationException e) {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body("Access denied");
     }
-
 }

@@ -33,8 +33,9 @@ public class AuthController {
 
     @Autowired
     private JwtUtils jwtUtils;
+    public static final String LOGIN_CONTROLLER_PATH = "/login";
 
-    @PostMapping(path = "/login")
+    @PostMapping(path = LOGIN_CONTROLLER_PATH)
     public String authUser(@RequestBody Map<String, String> userData) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userData.get("email"), userData.get("password")));
