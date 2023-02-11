@@ -12,3 +12,19 @@
 
 ### Link to App:
 https://my-spring-web.onrender.com
+
+### Task manager - task control application.
+
+### Stack:
+
+- Java 17;
+- Gradle 7+;
+- Spring Boot, Spring Data JPA, Spring Security;
+- Liquibase;
+- H2, PostgreSQL;
+- Lombok;
+- JUnit;
+- QueryDSL.
+
+### Run: make start
+
