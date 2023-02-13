@@ -6,8 +6,8 @@ build/
 !**/src/test/**/build/
 
 *.db
-app/node
 
+node
 ### STS ###
 .apt_generated
 .classpath
