@@ -3,6 +3,7 @@ package hexlet.code.app.controller;
 import hexlet.code.app.domain.DTO.StatusDTO;
 import hexlet.code.app.domain.model.Status;
 import hexlet.code.app.service.StatusServiceImpl;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import static hexlet.code.app.controller.StatusController.STATUS_CONTROLLER_PATH
 
 @RestController
 @RequestMapping(path = "${base-url}" + STATUS_CONTROLLER_PATH)
+@Hidden
 public class StatusController {
 
     @Autowired

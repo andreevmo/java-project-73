@@ -48,11 +48,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         RequestMatcher publicUrls = new OrRequestMatcher(
                 new AntPathRequestMatcher("/api/users", POST.name()),
-                new AntPathRequestMatcher("/api/users", GET.name()),
+                new AntPathRequestMatcher("/api/users/**", GET.name()),
                 new AntPathRequestMatcher("/api/login", POST.name()),
                 new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**"))
         );
-        http.csrf().disable()
+        http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()

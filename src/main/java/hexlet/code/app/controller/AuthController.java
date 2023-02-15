@@ -2,6 +2,7 @@ package hexlet.code.app.controller;
 
 import hexlet.code.app.config.jwt.JwtUtils;
 import hexlet.code.app.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import java.util.Map;
 @RestController
 @CrossOrigin
 @RequestMapping(path = "${base-url}")
+@Hidden
 public class AuthController {
 
     @Autowired
@@ -34,7 +36,6 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
     public static final String LOGIN_CONTROLLER_PATH = "/login";
-
     @PostMapping(path = LOGIN_CONTROLLER_PATH)
     public String authUser(@RequestBody Map<String, String> userData) {
         Authentication authentication = authenticationManager.authenticate(
@@ -43,5 +44,4 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return jwtUtils.generateJwtToken(userDetails.getUsername());
     }
-
 }
