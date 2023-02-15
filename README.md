@@ -11,7 +11,9 @@
 <a href="https://codeclimate.com/github/andreevmo/java-project-73/test_coverage"><img src="https://api.codeclimate.com/v1/badges/6b3030364e5e5cd0c1cf/test_coverage" /></a>
 
 ### Link to App:
-https://my-spring-web.onrender.com
+[TaskManager](https://my-spring-web.onrender.com)
+
+[ApiDoc](https://my-spring-web.onrender.com/swagger-ui.html)
 
 ### Task manager - task control application.
 
