@@ -1,5 +1,6 @@
 package hexlet.code.app.exception;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@Hidden
 @RestControllerAdvice
 public class CustomExceptionHandler {
 

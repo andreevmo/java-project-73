@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Hidden
 @RestController
-@RequestMapping(path = "${base-url}")
+@RequestMapping(path = "/welcome")
 public final class WelcomeController {
 
-    @GetMapping(path = "/welcome")
+    @GetMapping
     public String greet() {
         return "Welcome to Spring";
     }
