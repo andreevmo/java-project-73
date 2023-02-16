@@ -18,7 +18,7 @@ group = 'hexlet.code'
 version = '1.0-SNAPSHOT'
 
 application {
-	mainClass = 'hexlet.code.app.AppApplication'
+	mainClass = 'hexlet.code.AppApplication'
 }
 
 repositories {
