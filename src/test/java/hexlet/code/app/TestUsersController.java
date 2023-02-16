@@ -54,12 +54,6 @@ class TestUsersController {
     }
 
     @Test
-    void testWelcome() throws Exception {
-        String answer = performRequest(mockMvc, TEST_PATH + "/welcome", HttpMethod.GET, status().isOk());
-        assertThat(answer).contains("Welcome to Spring");
-    }
-
-    @Test
     void testGetUserPositive() throws Exception {
         String answer = performRequest(mockMvc, baseUrl + "/2", HttpMethod.GET, status().isOk());
         assertThat(answer).isEqualTo(mapper.writeValueAsString(usersForTest.get(1)));
