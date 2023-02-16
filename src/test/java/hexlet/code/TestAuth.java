@@ -69,7 +69,7 @@ public class TestAuth {
     @Test
     @Sql(value = {"/importSQL/importUsers.sql"})
     void testRequestWithToken() throws Exception {
-        performRequest(mockMvc, TEST_PATH + USER_CONTROLLER_PATH, HttpMethod.POST, status().isOk(),
+        performRequest(mockMvc, TEST_PATH + USER_CONTROLLER_PATH, HttpMethod.POST, status().isCreated(),
                 BODY_FOR_TEST_USERS);
         String token = jwtUtils.generateJwtToken("ivan@google.com");
         String incorrectToken = jwtUtils.generateJwtToken("ivan@google.ru");
@@ -77,7 +77,7 @@ public class TestAuth {
               .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(BODY_FOR_TEST_TASK))
-              .andExpect(status().isOk());
+              .andExpect(status().isCreated());
         mockMvc.perform(MockMvcRequestBuilders.post(TEST_PATH + TASK_CONTROLLER_PATH)
                         .header("Authorization", "Bearer " + incorrectToken)
                         .contentType(MediaType.APPLICATION_JSON)

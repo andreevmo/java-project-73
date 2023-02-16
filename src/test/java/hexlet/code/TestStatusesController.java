@@ -68,7 +68,7 @@ public class TestStatusesController {
 
     @Test
     void testPostStatus() throws Exception {
-        String answer = performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isOk(), BODY_FOR_TEST_STATUSES);
+        String answer = performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isCreated(), BODY_FOR_TEST_STATUSES);
         Status status = statusRepository.findById(5L).orElseThrow();
         assertThat(status.getName()).isEqualTo("Closed");
         assertThat(answer).contains(mapper.writeValueAsString(status));

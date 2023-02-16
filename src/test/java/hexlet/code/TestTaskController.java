@@ -104,7 +104,7 @@ public class TestTaskController {
     @Test
     void testPostTask() throws Exception {
         String answer = TestUtils.performRequest(
-                mockMvc, baseUrl, HttpMethod.POST, status().isOk(), TestUtils.BODY_FOR_TEST_TASK);
+                mockMvc, baseUrl, HttpMethod.POST, status().isCreated(), TestUtils.BODY_FOR_TEST_TASK);
         Task task = taskRepository.findById(3L).orElseThrow();
         assertThat(task.getName()).isEqualTo("Новое имя");
         assertThat(task.getDescription()).isEqualTo("Новое описание");

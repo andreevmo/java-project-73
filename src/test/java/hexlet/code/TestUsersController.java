@@ -72,7 +72,7 @@ class TestUsersController {
 
     @Test
     void testPostUser() throws Exception {
-        String answer = performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isOk(), BODY_FOR_TEST_USERS);
+        String answer = performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isCreated(), BODY_FOR_TEST_USERS);
         User user = userRepository.findById(3L).orElseThrow();
         assertThat(user.getEmail()).isEqualTo("maxim_525@mail.ru");
         assertThat(answer).isEqualTo(mapper.writeValueAsString(user));
@@ -114,7 +114,7 @@ class TestUsersController {
 
     @Test
     void testUniqueEmail() throws Exception {
-        performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isOk(), BODY_FOR_TEST_USERS);
+        performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isCreated(), BODY_FOR_TEST_USERS);
         performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isUnprocessableEntity(), BODY_FOR_TEST_USERS);
     }
 }

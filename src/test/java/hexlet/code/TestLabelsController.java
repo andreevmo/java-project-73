@@ -67,7 +67,7 @@ public class TestLabelsController {
 
     @Test
     void testPostStatus() throws Exception {
-        String answer = performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isOk(), BODY_FOR_TEST_LABELS);
+        String answer = performRequest(mockMvc, baseUrl, HttpMethod.POST, status().isCreated(), BODY_FOR_TEST_LABELS);
         Label label = labelRepository.findById(3L).orElseThrow();
         assertThat(label.getName()).isEqualTo("bug");
         assertThat(answer).contains(mapper.writeValueAsString(label));

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -38,7 +40,7 @@ public class LabelController {
         @ApiResponse(responseCode = "200", description = Description.SUCCESS),
         @ApiResponse(responseCode = "401", description = Description.UNAUTHORIZED, content = @Content)
     })
-    @GetMapping
+    @GetMapping()
     public List<Label> getLabels() {
         return service.getLabels();
     }
@@ -58,13 +60,14 @@ public class LabelController {
 
     @Operation(summary = Description.POST)
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = Description.SUCCESS,
+        @ApiResponse(responseCode = "201", description = Description.SUCCESS,
                 content = { @Content(mediaType = "application/json",
                         schema = @Schema(implementation = Label.class)) }),
         @ApiResponse(responseCode = "422", description = Description.UNPROCESSABLE_ENTITY, content = @Content),
         @ApiResponse(responseCode = "401", description = Description.UNAUTHORIZED, content = @Content)
     })
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Label createLabel(@RequestBody @Valid LabelDTO labelDTO) {
         return service.saveLabel(labelDTO);
     }
