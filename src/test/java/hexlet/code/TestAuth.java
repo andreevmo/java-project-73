@@ -68,7 +68,7 @@ public class TestAuth {
     }
 
     @Test
-    @Sql(value = {"/importSQL/importUsers.sql"})
+    @Sql(value = {"/importSQL/importUsers.sql", "/importSQL/importStatuses.sql"})
     void testRequestWithToken() throws Exception {
         performRequest(mockMvc, TEST_PATH + USER_CONTROLLER_PATH, HttpMethod.POST, status().isCreated(),
                 BODY_FOR_TEST_USERS);

@@ -1,7 +1,9 @@
 package hexlet.code.config;
 
 import hexlet.code.config.jwt.AuthEntryPointJwt;
-import hexlet.code.config.jwt.AuthJwtTokenFilter;
+import hexlet.code.config.jwt.JwtUtils;
+import hexlet.code.filter.JwtAuthenticationFilter;
+import hexlet.code.filter.JwtAuthorizationFilter;
 import hexlet.code.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -30,13 +35,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    @Bean
-    public AuthJwtTokenFilter authJwtTokenFilter() {
-        return new AuthJwtTokenFilter();
-    }
-
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    private final RequestMatcher publicUrls = new OrRequestMatcher(
+            new AntPathRequestMatcher("/api/users", POST.name()),
+            new AntPathRequestMatcher("/api/users/**", GET.name()),
+            new AntPathRequestMatcher("/api/login", POST.name()),
+            new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**"))
+    );
 
     @Bean
     @Override
@@ -46,12 +56,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        RequestMatcher publicUrls = new OrRequestMatcher(
-                new AntPathRequestMatcher("/api/users", POST.name()),
-                new AntPathRequestMatcher("/api/users/**", GET.name()),
-                new AntPathRequestMatcher("/api/login", POST.name()),
-                new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**"))
-        );
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
@@ -59,7 +63,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .requestMatchers(publicUrls).permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilterBefore(authJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtUtils))
+                .addFilterBefore(new JwtAuthorizationFilter(authenticationManager(), jwtUtils),
+                        UsernamePasswordAuthenticationFilter.class)
+                .formLogin().disable();
         http.headers().frameOptions().disable();
     }
 
@@ -71,5 +78,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+
+        return source;
     }
 }

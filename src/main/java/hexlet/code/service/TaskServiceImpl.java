@@ -13,7 +13,6 @@ import hexlet.code.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -66,10 +65,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private Task createTask(TaskDTO taskDTO) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
-        User author = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User author = userRepository.findByEmail(email).orElseThrow();
         User executor = taskDTO.getExecutorId() == null ? null
                 : userRepository.findById(taskDTO.getExecutorId()).orElse(null);
         Status status = statusRepository.findById(taskDTO.getTaskStatusId()).orElseThrow();
