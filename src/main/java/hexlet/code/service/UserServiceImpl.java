@@ -20,9 +20,6 @@ public class UserServiceImpl implements UserService {
 
     public User saveUser(UserDTO userDTO) {
         User user = createUser(userDTO);
-        String password = user.getPassword();
-        String encodedPassword = passwordEncoder.encode(password);
-        user.setPassword(encodedPassword);
         return userRepository.save(user);
     }
 
@@ -54,7 +51,7 @@ public class UserServiceImpl implements UserService {
                 userDTO.getFirstName(),
                 userDTO.getLastName(),
                 userDTO.getEmail(),
-                userDTO.getPassword()
+                passwordEncoder.encode(userDTO.getPassword())
         );
     }
 }
