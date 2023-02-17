@@ -1,4 +1,4 @@
-package hexlet.code;
+package hexlet.code.utils;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;

@@ -20,9 +20,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
-import static hexlet.code.TestUtils.BODY_FOR_TEST_STATUSES;
-import static hexlet.code.TestUtils.TEST_PATH;
-import static hexlet.code.TestUtils.performRequest;
+import static hexlet.code.utils.TestUtils.BODY_FOR_TEST_STATUSES;
+import static hexlet.code.utils.TestUtils.TEST_PATH;
+import static hexlet.code.utils.TestUtils.performRequest;
 import static hexlet.code.controller.StatusController.STATUS_CONTROLLER_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
