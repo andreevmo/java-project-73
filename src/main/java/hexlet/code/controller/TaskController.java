@@ -63,7 +63,7 @@ public class TaskController {
     @GetMapping
     public List<Task> getTasks(@Parameter(hidden = true) @QuerydslPredicate(root = Task.class) Predicate predicate,
                                @Parameter(hidden = true) Pageable pageable) {
-        return taskService.getAll(predicate, pageable);
+        return taskService.getTasks(predicate, pageable);
     }
 
     @Operation(summary = Description.POST)

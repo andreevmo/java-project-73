@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
         return userFromDatabase;
     }
 
-    public List<User> getAll() {
+    public List<User> getUsers() {
         return (List<User>) userRepository.findAll();
     }
 

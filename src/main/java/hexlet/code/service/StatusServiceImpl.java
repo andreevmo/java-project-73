@@ -25,8 +25,7 @@ public class StatusServiceImpl implements StatusService {
     @Transactional
     public Status updateStatus(StatusDTO statusDTO, Long id) {
         Status status = createStatus(statusDTO);
-        Status statusFromDB = statusRepository.findById(id)
-                .orElseThrow();
+        Status statusFromDB = statusRepository.findById(id).orElseThrow();
         statusFromDB.setName(status.getName());
         return statusFromDB;
     }

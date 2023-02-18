@@ -11,7 +11,7 @@ public interface TaskService {
 
     Task saveTask(TaskDTO taskDTO);
     Task updateTask(TaskDTO taskDTO, Long id);
-    List<Task> getAll(Predicate predicate, Pageable pageable);
+    List<Task> getTasks(Predicate predicate, Pageable pageable);
     Task getTask(Long id);
     void deleteTask(Long id);
 }

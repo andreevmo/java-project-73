@@ -56,7 +56,7 @@ public class UserController {
     })
     @GetMapping
     public List<User> getUsers() {
-        return userServiceImpl.getAll();
+        return userServiceImpl.getUsers();
     }
 
 

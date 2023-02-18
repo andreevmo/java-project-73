@@ -53,7 +53,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getAll(Predicate predicate, Pageable pageable) {
+    public List<Task> getTasks(Predicate predicate, Pageable pageable) {
         return (List<Task>) taskRepository.findAll(predicate);
     }
 
