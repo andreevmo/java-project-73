@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -33,7 +32,7 @@ public class Task extends BaseModel {
     private User author;
     @ManyToOne(fetch = FetchType.EAGER)
     private User executor;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "task_label",
             joinColumns = {@JoinColumn(name = "task_id")},

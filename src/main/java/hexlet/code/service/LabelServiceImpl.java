@@ -5,6 +5,7 @@ import hexlet.code.domain.model.Label;
 import hexlet.code.repository.LabelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -31,10 +32,11 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
+    @Transactional
     public Label updateLabel(LabelDTO labelDTO, long id) {
         Label labelFromDB = labelRepository.findById(id).orElseThrow();
         labelFromDB.setName(labelDTO.getName());
-        return labelRepository.save(labelFromDB);
+        return labelFromDB;
     }
 
     @Override

@@ -6,6 +6,7 @@ import hexlet.code.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -23,12 +24,15 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
     public User updateUser(Long id, UserDTO userDTO) {
         User user = createUser(userDTO);
         User userFromDatabase = userRepository.findById(id).orElseThrow();
-        user.setId(id);
-        user.setCreatedAt(userFromDatabase.getCreatedAt());
-        return userRepository.save(user);
+        userFromDatabase.setEmail(user.getEmail());
+        userFromDatabase.setPassword(user.getPassword());
+        userFromDatabase.setFirstName(user.getFirstName());
+        userFromDatabase.setLastName(user.getLastName());
+        return userFromDatabase;
     }
 
     public List<User> getAll() {

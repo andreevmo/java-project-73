@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,12 +39,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public Task updateTask(TaskDTO taskDTO, Long id) {
         Task taskFromDB = taskRepository.findById(id).orElseThrow();
         Task task = createTask(taskDTO);
-        task.setId(id);
-        task.setCreatedAt(taskFromDB.getCreatedAt());
-        return taskRepository.save(task);
+        taskFromDB.setTaskStatus(task.getTaskStatus());
+        taskFromDB.setAuthor(task.getAuthor());
+        taskFromDB.setName(task.getName());
+        taskFromDB.setLabels(task.getLabels());
+        taskFromDB.setExecutor(task.getExecutor());
+        taskFromDB.setDescription(task.getDescription());
+        return taskFromDB;
     }
 
     @Override

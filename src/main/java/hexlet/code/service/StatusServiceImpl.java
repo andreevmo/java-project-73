@@ -5,6 +5,7 @@ import hexlet.code.domain.model.Status;
 import hexlet.code.repository.StatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,12 +22,13 @@ public class StatusServiceImpl implements StatusService {
     }
 
     @Override
+    @Transactional
     public Status updateStatus(StatusDTO statusDTO, Long id) {
         Status status = createStatus(statusDTO);
         Status statusFromDB = statusRepository.findById(id)
                 .orElseThrow();
         statusFromDB.setName(status.getName());
-        return statusRepository.save(statusFromDB);
+        return statusFromDB;
     }
 
     @Override
