@@ -1,5 +1,5 @@
 setup:
-	gradle wrapper --gradle-version 7.4
+	gradle wrapper --gradle-version 7.3
 
 clean:
 	./gradlew clean
@@ -8,16 +8,16 @@ build:
 	./gradlew clean build
 
 start:
-	./gradlew run
+	./gradlew bootRun --args='--spring.profiles.active=development'
 
-installDist:
+start-prod:
+	./gradlew bootRun --args='--spring.profiles.active=production'
+
+install:
 	./gradlew installDist
 
 start-dist:
-	APP_ENV=production ./build/install/app/bin/app
-
-generate-migrations:
-	./gradlew generateMigrations
+	./build/install/app/bin/app
 
 lint:
 	./gradlew checkstyleMain checkstyleTest
@@ -31,4 +31,8 @@ report:
 check-updates:
 	./gradlew dependencyUpdates
 
-.PHONY: build
+generate-migrations:
+	gradle diffChangeLog
+
+db-migrate:
+	./gradlew update
