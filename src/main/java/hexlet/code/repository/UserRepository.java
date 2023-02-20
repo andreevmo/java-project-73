@@ -1,6 +1,6 @@
 package hexlet.code.repository;
 
-import hexlet.code.domain.model.User;
+import hexlet.code.model.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

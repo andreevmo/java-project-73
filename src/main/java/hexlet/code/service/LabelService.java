@@ -1,7 +1,7 @@
 package hexlet.code.service;
 
-import hexlet.code.domain.DTO.LabelDTO;
-import hexlet.code.domain.model.Label;
+import hexlet.code.DTO.LabelDTO;
+import hexlet.code.model.Label;
 
 import java.util.List;
 

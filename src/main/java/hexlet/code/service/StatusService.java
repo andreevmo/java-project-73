@@ -1,7 +1,7 @@
 package hexlet.code.service;
 
-import hexlet.code.domain.DTO.StatusDTO;
-import hexlet.code.domain.model.Status;
+import hexlet.code.DTO.StatusDTO;
+import hexlet.code.model.Status;
 
 import java.util.List;
 

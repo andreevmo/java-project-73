@@ -2,7 +2,7 @@ package hexlet.code.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.config.jwt.JwtUtils;
-import hexlet.code.domain.DTO.UserDTO;
+import hexlet.code.DTO.UserDTO;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

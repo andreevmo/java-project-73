@@ -1,7 +1,7 @@
 package hexlet.code.service;
 
-import hexlet.code.domain.DTO.UserDTO;
-import hexlet.code.domain.model.User;
+import hexlet.code.DTO.UserDTO;
+import hexlet.code.model.User;
 
 import javax.security.sasl.AuthenticationException;
 import java.util.List;

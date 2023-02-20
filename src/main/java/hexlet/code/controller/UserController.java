@@ -1,7 +1,7 @@
 package hexlet.code.controller;
 
-import hexlet.code.domain.DTO.UserDTO;
-import hexlet.code.domain.model.User;
+import hexlet.code.DTO.UserDTO;
+import hexlet.code.model.User;
 import hexlet.code.service.UserServiceImpl;
 import hexlet.code.utils.Description;
 import io.swagger.v3.oas.annotations.Operation;

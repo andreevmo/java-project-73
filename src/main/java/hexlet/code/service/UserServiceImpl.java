@@ -1,7 +1,7 @@
 package hexlet.code.service;
 
-import hexlet.code.domain.DTO.UserDTO;
-import hexlet.code.domain.model.User;
+import hexlet.code.DTO.UserDTO;
+import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

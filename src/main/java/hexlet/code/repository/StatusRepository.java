@@ -1,6 +1,6 @@
 package hexlet.code.repository;
 
-import hexlet.code.domain.model.Status;
+import hexlet.code.model.Status;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

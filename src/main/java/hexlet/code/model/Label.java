@@ -1,16 +1,15 @@
-package hexlet.code.domain.model;
+package hexlet.code.model;
 
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-
 @Entity
-@Table(name = "statuses")
+@Table(name = "labels")
 @NoArgsConstructor
-public class Status extends ModifiedBaseModel {
-    public Status(String name) {
+public class Label extends ModifiedBaseModel {
+    public Label(String name) {
         super(name);
     }
 }

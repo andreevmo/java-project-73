@@ -1,10 +1,10 @@
 package hexlet.code;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.domain.model.Label;
-import hexlet.code.domain.model.Status;
-import hexlet.code.domain.model.Task;
-import hexlet.code.domain.model.User;
+import hexlet.code.model.Label;
+import hexlet.code.model.Status;
+import hexlet.code.model.Task;
+import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.StatusRepository;
 import hexlet.code.repository.TaskRepository;

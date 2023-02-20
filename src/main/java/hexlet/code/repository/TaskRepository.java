@@ -1,7 +1,7 @@
 package hexlet.code.repository;
 
-import hexlet.code.domain.model.QTask;
-import hexlet.code.domain.model.Task;
+import hexlet.code.model.QTask;
+import hexlet.code.model.Task;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;

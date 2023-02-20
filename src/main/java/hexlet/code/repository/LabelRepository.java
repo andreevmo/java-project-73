@@ -1,6 +1,6 @@
 package hexlet.code.repository;
 
-import hexlet.code.domain.model.Label;
+import hexlet.code.model.Label;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

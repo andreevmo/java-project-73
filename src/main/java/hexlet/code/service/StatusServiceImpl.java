@@ -1,7 +1,7 @@
 package hexlet.code.service;
 
-import hexlet.code.domain.DTO.StatusDTO;
-import hexlet.code.domain.model.Status;
+import hexlet.code.DTO.StatusDTO;
+import hexlet.code.model.Status;
 import hexlet.code.repository.StatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

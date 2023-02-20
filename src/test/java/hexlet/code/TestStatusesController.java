@@ -2,7 +2,7 @@ package hexlet.code;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.domain.model.Status;
+import hexlet.code.model.Status;
 import hexlet.code.repository.StatusRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

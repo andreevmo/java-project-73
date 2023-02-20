@@ -1,7 +1,7 @@
 package hexlet.code.controller;
 
-import hexlet.code.domain.DTO.StatusDTO;
-import hexlet.code.domain.model.Status;
+import hexlet.code.DTO.StatusDTO;
+import hexlet.code.model.Status;
 import hexlet.code.service.StatusServiceImpl;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;

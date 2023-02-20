@@ -1,4 +1,4 @@
-package hexlet.code.domain.DTO;
+package hexlet.code.DTO;
 
 import lombok.Data;
 

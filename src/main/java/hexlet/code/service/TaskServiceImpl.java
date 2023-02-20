@@ -1,11 +1,11 @@
 package hexlet.code.service;
 
 import com.querydsl.core.types.Predicate;
-import hexlet.code.domain.DTO.TaskDTO;
-import hexlet.code.domain.model.Label;
-import hexlet.code.domain.model.Status;
-import hexlet.code.domain.model.Task;
-import hexlet.code.domain.model.User;
+import hexlet.code.DTO.TaskDTO;
+import hexlet.code.model.Label;
+import hexlet.code.model.Status;
+import hexlet.code.model.Task;
+import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.StatusRepository;
 import hexlet.code.repository.TaskRepository;

@@ -1,6 +1,6 @@
 package hexlet.code.service;
 
-import hexlet.code.domain.model.User;
+import hexlet.code.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
