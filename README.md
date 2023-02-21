@@ -21,12 +21,20 @@
 
 - Java 17;
 - Gradle 7+;
-- Spring Boot, Spring Data JPA, Spring Security;
+- Spring Boot, Spring Web, Spring Data JPA, Spring Security;
 - Liquibase;
 - H2, PostgreSQL;
 - Lombok;
 - JUnit;
 - QueryDSL.
 
-### Run: make start
+### System requirements:
+- Java 17.
+
+### Setup:
+```sh
+make setup # setup gradle
+make start # run server http://localhost:5000
+make test # run tests
+```
 
