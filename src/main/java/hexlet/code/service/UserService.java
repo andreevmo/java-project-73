@@ -3,7 +3,6 @@ package hexlet.code.service;
 import hexlet.code.DTO.UserDTO;
 import hexlet.code.model.User;
 
-import javax.security.sasl.AuthenticationException;
 import java.util.List;
 
 public interface UserService {
