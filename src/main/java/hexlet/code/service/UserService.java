@@ -13,4 +13,6 @@ public interface UserService {
     List<User> getUsers();
     User getUser(Long id);
     void deleteUser(Long id) throws AuthenticationException, org.springframework.security.core.AuthenticationException;
+    User getCurrentUser();
+    String getCurrentUsername();
 }

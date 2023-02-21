@@ -3,17 +3,16 @@ package hexlet.code.service;
 import hexlet.code.DTO.LabelDTO;
 import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
+@AllArgsConstructor
 public class LabelServiceImpl implements LabelService {
 
-    @Autowired
     private LabelRepository labelRepository;
     @Override
     public Label getLabel(long id) {
@@ -41,9 +40,6 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public void deleteLabel(long id) {
-        if (!labelRepository.existsById(id)) {
-            throw new NoSuchElementException();
-        }
         labelRepository.deleteById(id);
     }
 

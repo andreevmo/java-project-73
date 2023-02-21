@@ -1,6 +1,7 @@
 package hexlet.code;
 
 import hexlet.code.config.jwt.JwtUtils;
+import hexlet.code.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,15 +17,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static hexlet.code.utils.TestUtils.BODY_FOR_TEST_LOGIN;
-import static hexlet.code.utils.TestUtils.BODY_FOR_TEST_TASK;
-import static hexlet.code.utils.TestUtils.BODY_FOR_TEST_USERS;
-import static hexlet.code.utils.TestUtils.TEST_PATH;
-import static hexlet.code.utils.TestUtils.performRequest;
 import static hexlet.code.controller.LabelController.LABEL_CONTROLLER_PATH;
 import static hexlet.code.controller.StatusController.STATUS_CONTROLLER_PATH;
 import static hexlet.code.controller.TaskController.TASK_CONTROLLER_PATH;
 import static hexlet.code.controller.UserController.USER_CONTROLLER_PATH;
+import static hexlet.code.utils.TestUtils.BODY_FOR_TEST_LOGIN;
+import static hexlet.code.utils.TestUtils.BODY_FOR_TEST_TASK;
+import static hexlet.code.utils.TestUtils.BODY_FOR_TEST_USERS;
+import static hexlet.code.utils.TestUtils.TEST_PATH;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -38,6 +38,9 @@ public class TestAuth {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private TestUtils testUtils;
+
     public static final String LOGIN_CONTROLLER_PATH = TEST_PATH + "/login";
 
     @ParameterizedTest
@@ -49,20 +52,24 @@ public class TestAuth {
     })
     void testRequestWithoutAuth(String controllerPath) throws Exception {
         if (!controllerPath.equals(USER_CONTROLLER_PATH)) {
-            performRequest(mockMvc, TEST_PATH + controllerPath, HttpMethod.GET, status().isUnauthorized());
-            performRequest(mockMvc, TEST_PATH + controllerPath, HttpMethod.POST, status().isUnauthorized());
+            testUtils.performRequest(
+                    mockMvc, TEST_PATH + controllerPath, HttpMethod.GET, status().isUnauthorized());
+            testUtils.performRequest(
+                    mockMvc, TEST_PATH + controllerPath, HttpMethod.POST, status().isUnauthorized());
         }
-        performRequest(mockMvc, TEST_PATH + controllerPath + "/1", HttpMethod.PUT, status().isUnauthorized());
-        performRequest(mockMvc, TEST_PATH + controllerPath + "/1", HttpMethod.DELETE, status().isUnauthorized());
+        testUtils.performRequest(
+                mockMvc, TEST_PATH + controllerPath + "/1", HttpMethod.PUT, status().isUnauthorized());
+        testUtils.performRequest(
+                mockMvc, TEST_PATH + controllerPath + "/1", HttpMethod.DELETE, status().isUnauthorized());
     }
 
     @Test
     @Sql(value = {"/importSQL/importUsers.sql"})
     void testLogin() throws Exception {
-        performRequest(mockMvc, LOGIN_CONTROLLER_PATH, HttpMethod.POST, status().isOk(),
+        testUtils.performRequest(mockMvc, LOGIN_CONTROLLER_PATH, HttpMethod.POST, status().isOk(),
                 BODY_FOR_TEST_LOGIN);
         String incorrectData = BODY_FOR_TEST_LOGIN.replace("ivan@google.com", "max_525@mail.ru");
-        performRequest(
+        testUtils.performRequest(
                 mockMvc, LOGIN_CONTROLLER_PATH, HttpMethod.POST, status().isUnauthorized(),
                 incorrectData);
     }
@@ -70,7 +77,7 @@ public class TestAuth {
     @Test
     @Sql(value = {"/importSQL/importUsers.sql", "/importSQL/importStatuses.sql"})
     void testRequestWithToken() throws Exception {
-        performRequest(mockMvc, TEST_PATH + USER_CONTROLLER_PATH, HttpMethod.POST, status().isCreated(),
+        testUtils.performRequest(mockMvc, TEST_PATH + USER_CONTROLLER_PATH, HttpMethod.POST, status().isCreated(),
                 BODY_FOR_TEST_USERS);
         String token = jwtUtils.generateJwtToken("ivan@google.com");
         mockMvc.perform(MockMvcRequestBuilders.post(TEST_PATH + TASK_CONTROLLER_PATH)

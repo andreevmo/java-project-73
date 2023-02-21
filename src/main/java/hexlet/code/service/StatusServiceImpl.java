@@ -3,17 +3,16 @@ package hexlet.code.service;
 import hexlet.code.DTO.StatusDTO;
 import hexlet.code.model.Status;
 import hexlet.code.repository.StatusRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
+@AllArgsConstructor
 public class StatusServiceImpl implements StatusService {
 
-    @Autowired
     private StatusRepository statusRepository;
     @Override
     public Status saveStatus(StatusDTO statusDTO) {
@@ -43,9 +42,6 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     public void deleteStatus(Long id) {
-        if (!statusRepository.existsById(id)) {
-            throw new NoSuchElementException();
-        }
         statusRepository.deleteById(id);
     }
 

@@ -6,36 +6,33 @@ import hexlet.code.model.Label;
 import hexlet.code.model.Status;
 import hexlet.code.model.Task;
 import hexlet.code.model.User;
-import hexlet.code.repository.LabelRepository;
-import hexlet.code.repository.StatusRepository;
 import hexlet.code.repository.TaskRepository;
-import hexlet.code.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class TaskServiceImpl implements TaskService {
 
-    @Autowired
     private TaskRepository taskRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private StatusRepository statusRepository;
-    @Autowired
-    private LabelRepository labelRepository;
+    private UserService userService;
+    private LabelService labelService;
+    private StatusService statusService;
     @Override
     public Task saveTask(TaskDTO taskDTO) {
         Task task = createTask(taskDTO);
-        return taskRepository.save(task);
+        System.out.println(task);
+        task = taskRepository.save(task);
+        System.out.println(task);
+        return task;
     }
 
     @Override
@@ -64,29 +61,27 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void deleteTask(Long id) {
-        if (!taskRepository.existsById(id)) {
-            throw new NoSuchElementException();
-        }
         taskRepository.deleteById(id);
     }
 
-    private Task createTask(TaskDTO taskDTO) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User author = userRepository.findByEmail(email).orElseThrow();
-        User executor = taskDTO.getExecutorId() == null ? null
-                : userRepository.findById(taskDTO.getExecutorId()).orElse(null);
-        Status status = statusRepository.findById(taskDTO.getTaskStatusId()).orElseThrow();
-        List<Label> labelList = taskDTO.getLabelIds() == null ? new ArrayList<>()
-                : Arrays.stream(taskDTO.getLabelIds())
-                .map(id -> labelRepository.findById(id).orElseThrow())
-                .toList();
-        return new Task(
-                taskDTO.getName(),
-                taskDTO.getDescription(),
-                status,
-                author,
-                executor,
-                labelList
-        );
+    private Task createTask(final TaskDTO taskDTO) {
+        final User author = userService.getCurrentUser();
+        final User executor = userService.getUser(taskDTO.getExecutorId());
+        final Status status = statusService.getStatus(taskDTO.getTaskStatusId());
+        final Set<Label> labels = Optional.ofNullable(taskDTO.getLabelIds())
+                .orElse(Set.of())
+                .stream()
+                .filter(Objects::nonNull)
+                .map(id -> labelService.getLabel(id))
+                .collect(Collectors.toSet());
+
+        return Task.builder()
+                .name(taskDTO.getName())
+                .description(taskDTO.getDescription())
+                .taskStatus(status)
+                .labels(labels)
+                .author(author)
+                .executor(executor)
+                .build();
     }
 }

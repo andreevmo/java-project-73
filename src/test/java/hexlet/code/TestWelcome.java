@@ -16,9 +16,11 @@ public class TestWelcome {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private TestUtils testUtils;
     @Test
     void testWelcome() throws Exception {
-        String answer = TestUtils.performRequest(
+        String answer = testUtils.performRequest(
                 mockMvc, "http://localhost:5000/welcome", HttpMethod.GET, status().isOk());
         assertThat(answer).contains("Welcome to Spring");
     }

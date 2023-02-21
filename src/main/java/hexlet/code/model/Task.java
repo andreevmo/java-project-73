@@ -1,6 +1,7 @@
 package hexlet.code.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.util.List;
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -21,6 +22,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Task extends BaseModel {
 
     private String name;
@@ -37,6 +39,6 @@ public class Task extends BaseModel {
             name = "task_label",
             joinColumns = {@JoinColumn(name = "task_id")},
             inverseJoinColumns = {@JoinColumn(name = "label_id")})
-    private List<Label> labels;
+    private Set<Label> labels;
 
 }

@@ -5,7 +5,6 @@ import hexlet.code.config.jwt.JwtUtils;
 import hexlet.code.filter.JwtAuthenticationFilter;
 import hexlet.code.filter.JwtAuthorizationFilter;
 import hexlet.code.service.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -32,21 +31,24 @@ import static org.springframework.http.HttpMethod.POST;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final AuthEntryPointJwt unauthorizedHandler;
+    private final JwtUtils jwtUtils;
+    private final RequestMatcher publicUrls;
 
-    @Autowired
-    private AuthEntryPointJwt unauthorizedHandler;
-
-    @Autowired
-    private JwtUtils jwtUtils;
-
-    private final RequestMatcher publicUrls = new OrRequestMatcher(
-            new AntPathRequestMatcher("/api/users", POST.name()),
-            new AntPathRequestMatcher("/api/users/**", GET.name()),
-            new AntPathRequestMatcher("/api/login", POST.name()),
-            new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**"))
-    );
+    public SecurityConfig(UserDetailsServiceImpl userDetailsService,
+                          AuthEntryPointJwt unauthorizedHandler,
+                          JwtUtils jwtUtils) {
+        this.userDetailsService = userDetailsService;
+        this.unauthorizedHandler = unauthorizedHandler;
+        this.jwtUtils = jwtUtils;
+        this.publicUrls = new OrRequestMatcher(
+                new AntPathRequestMatcher("/api/users", POST.name()),
+                new AntPathRequestMatcher("/api/users/**", GET.name()),
+                new AntPathRequestMatcher("/api/login", POST.name()),
+                new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**"))
+        );
+    }
 
     @Bean
     @Override
