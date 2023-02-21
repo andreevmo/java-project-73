@@ -2,7 +2,7 @@ package hexlet.code.controller;
 
 import hexlet.code.DTO.UserDTO;
 import hexlet.code.model.User;
-import hexlet.code.service.UserServiceImpl;
+import hexlet.code.service.UserService;
 import hexlet.code.utils.Description;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,14 +29,14 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "${base-url}" + UserController.USER_CONTROLLER_PATH)
 @Tag(name = "Пользователи", description = "Работа с пользователями")
+@AllArgsConstructor
 public class UserController {
 
     public static final String USER_CONTROLLER_PATH = "/users";
     private static final String AUTHORIZE_CONDITION =
             "@userRepository.findById(#id).get().getEmail() == authentication.getName()";
     public static final String ID = "/{id}";
-    @Autowired
-    private UserServiceImpl userServiceImpl;
+    private UserService userService;
 
     @Operation(summary = Description.GET)
     @ApiResponses(value = {
@@ -47,7 +47,7 @@ public class UserController {
     })
     @GetMapping(path = ID)
     public User getUser(@PathVariable long id) {
-        return userServiceImpl.getUser(id);
+        return userService.getUser(id);
     }
 
     @Operation(summary = Description.GET)
@@ -56,7 +56,7 @@ public class UserController {
     })
     @GetMapping
     public List<User> getUsers() {
-        return userServiceImpl.getUsers();
+        return userService.getUsers();
     }
 
 
@@ -70,7 +70,7 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody @Valid UserDTO userDTO) {
-        return userServiceImpl.saveUser(userDTO);
+        return userService.saveUser(userDTO);
     }
 
     @Operation(summary = Description.PUT)
@@ -86,7 +86,7 @@ public class UserController {
     @PutMapping(path = ID)
     @PreAuthorize(AUTHORIZE_CONDITION)
     public User updateUser(@PathVariable long id, @RequestBody @Valid UserDTO userDTO) {
-        return userServiceImpl.updateUser(id, userDTO);
+        return userService.updateUser(id, userDTO);
 
     }
 
@@ -101,6 +101,6 @@ public class UserController {
     @DeleteMapping(path = ID)
     @PreAuthorize(AUTHORIZE_CONDITION)
     public void deleteUser(@PathVariable long id) {
-        userServiceImpl.deleteUser(id);
+        userService.deleteUser(id);
     }
 }

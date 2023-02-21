@@ -12,7 +12,7 @@ public interface UserService {
     User updateUser(Long id, UserDTO userDTO);
     List<User> getUsers();
     User getUser(Long id);
-    void deleteUser(Long id) throws AuthenticationException, org.springframework.security.core.AuthenticationException;
+    void deleteUser(Long id);
     User getCurrentUser();
     String getCurrentUsername();
 }

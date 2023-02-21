@@ -3,7 +3,7 @@ package hexlet.code.controller;
 import com.querydsl.core.types.Predicate;
 import hexlet.code.DTO.TaskDTO;
 import hexlet.code.model.Task;
-import hexlet.code.service.TaskServiceImpl;
+import hexlet.code.service.TaskService;
 import hexlet.code.utils.Description;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.http.HttpStatus;
@@ -33,13 +33,13 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "${base-url}" + TaskController.TASK_CONTROLLER_PATH)
 @Tag(name = "Задачи", description = "Работа с задачами")
+@AllArgsConstructor
 public class TaskController {
     public static final String TASK_CONTROLLER_PATH = "/tasks";
     public static final String ID = "/{id}";
     private static final String AUTHORIZE_CONDITION =
             "@taskRepository.findById(#id).get().getAuthor().getEmail() == authentication.getName()";
-    @Autowired
-    private TaskServiceImpl taskService;
+    private TaskService taskService;
 
     @Operation(summary = Description.GET)
     @ApiResponses(value = {

@@ -2,9 +2,9 @@ package hexlet.code.controller;
 
 import hexlet.code.DTO.StatusDTO;
 import hexlet.code.model.Status;
-import hexlet.code.service.StatusServiceImpl;
+import hexlet.code.service.StatusService;
 import io.swagger.v3.oas.annotations.Hidden;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,37 +24,37 @@ import static hexlet.code.controller.StatusController.STATUS_CONTROLLER_PATH;
 @RestController
 @RequestMapping(path = "${base-url}" + STATUS_CONTROLLER_PATH)
 @Hidden
+@AllArgsConstructor
 public class StatusController {
 
-    @Autowired
-    private StatusServiceImpl service;
+    private StatusService statusService;
 
     public static final String STATUS_CONTROLLER_PATH = "/statuses";
     public static final String ID = "{id}";
 
     @GetMapping(path = ID)
     public Status getStatus(@PathVariable Long id) {
-        return service.getStatus(id);
+        return statusService.getStatus(id);
     }
 
     @GetMapping
     public List<Status> getStatuses() {
-        return service.getAll();
+        return statusService.getAll();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Status createStatus(@RequestBody @Valid StatusDTO statusDTO) {
-        return service.saveStatus(statusDTO);
+        return statusService.saveStatus(statusDTO);
     }
 
     @PutMapping(path = ID)
     public Status updateStatus(@RequestBody @Valid StatusDTO statusDTO, @PathVariable Long id) {
-        return service.updateStatus(statusDTO, id);
+        return statusService.updateStatus(statusDTO, id);
     }
 
     @DeleteMapping(path = ID)
     public void deleteStatus(@PathVariable Long id) {
-        service.deleteStatus(id);
+        statusService.deleteStatus(id);
     }
 }

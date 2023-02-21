@@ -2,7 +2,7 @@ package hexlet.code.controller;
 
 import hexlet.code.DTO.LabelDTO;
 import hexlet.code.model.Label;
-import hexlet.code.service.LabelServiceImpl;
+import hexlet.code.service.LabelService;
 import hexlet.code.utils.Description;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,11 +28,11 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "${base-url}" + LabelController.LABEL_CONTROLLER_PATH)
 @Tag(name = "Метки", description = "Работа с метками")
+@AllArgsConstructor
 public class LabelController {
     public static final String LABEL_CONTROLLER_PATH = "/labels";
     private static final String ID = "/{id}";
-    @Autowired
-    private LabelServiceImpl service;
+    private LabelService labelService;
 
 
     @Operation(summary = Description.GET)
@@ -42,7 +42,7 @@ public class LabelController {
     })
     @GetMapping()
     public List<Label> getLabels() {
-        return service.getLabels();
+        return labelService.getLabels();
     }
 
     @Operation(summary = Description.GET)
@@ -55,7 +55,7 @@ public class LabelController {
     })
     @GetMapping(path = ID)
     public Label getLabel(@PathVariable long id) {
-        return service.getLabel(id);
+        return labelService.getLabel(id);
     }
 
     @Operation(summary = Description.POST)
@@ -69,7 +69,7 @@ public class LabelController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Label createLabel(@RequestBody @Valid LabelDTO labelDTO) {
-        return service.saveLabel(labelDTO);
+        return labelService.saveLabel(labelDTO);
     }
 
     @Operation(summary = Description.PUT)
@@ -83,7 +83,7 @@ public class LabelController {
     })
     @PutMapping(path = ID)
     public Label updateLabel(@PathVariable long id, @RequestBody @Valid LabelDTO labelDTO) {
-        return service.updateLabel(labelDTO, id);
+        return labelService.updateLabel(labelDTO, id);
     }
 
     @Operation(summary = Description.DELETE)
@@ -95,6 +95,6 @@ public class LabelController {
     })
     @DeleteMapping(path = ID)
     public void deleteLabel(@PathVariable long id) {
-        service.deleteLabel(id);
+        labelService.deleteLabel(id);
     }
 }
